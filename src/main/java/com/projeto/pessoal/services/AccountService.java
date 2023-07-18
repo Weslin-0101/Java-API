@@ -1,9 +1,11 @@
 package com.projeto.pessoal.services;
 
 import com.projeto.pessoal.model.Account;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+@Service
 public class AccountService {
 
     private static final AtomicLong counter = new AtomicLong();
