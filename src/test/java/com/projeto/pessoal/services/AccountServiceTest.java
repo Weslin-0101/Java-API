@@ -28,4 +28,13 @@ class AccountServiceTest {
         assertEquals(ac.getName(), createdAccount.getName());
         assertEquals(ac.getPassword(), createdAccount.getPassword());
     }
+
+    @Test
+    void findByName() {
+        Account ac = AccountMock();
+
+        String name = new AccountService().findByName(ac.getName());
+
+        assertEquals(ac.getName(), name);
+    }
 }

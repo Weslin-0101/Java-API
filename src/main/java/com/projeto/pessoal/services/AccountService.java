@@ -24,4 +24,8 @@ public class AccountService {
     public Account createAccount(Account ac) {
         return ac;
     }
+
+    public String findByName(String name) {
+        return name;
+    }
 }
