@@ -2,10 +2,17 @@ package com.projeto.pessoal.services;
 
 import com.projeto.pessoal.controllers.AccountController;
 import com.projeto.pessoal.data.v1.AccountVO;
+import com.projeto.pessoal.exceptions.RequiredObjectsIsNullException;
 import com.projeto.pessoal.mapper.ModelMapperAdapter;
 import com.projeto.pessoal.mapper.custom.AccountMapper;
 import com.projeto.pessoal.model.Account;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -60,19 +67,33 @@ public class AccountService {
         return vo;
     }
 
-    public AccountVO findAll() throws Exception {
-        var entity = AccountMockArray(5)[2];
+    public ResponseEntity<AccountVO> findAll() throws Exception {
+        var entity = AccountMockArray(5)[2];;
 
         AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
         vo.add(linkTo(methodOn(AccountController.class).findAll()).withSelfRel());
 
-        return vo;
+        return ResponseEntity.ok(vo);
     }
 
     public AccountVO createAccount(AccountVO account) throws Exception {
-        if (account == null) throw new Exception("Account is null");
+        if (account == null) throw new RequiredObjectsIsNullException();
 
         var entity = ModelMapperAdapter.parseObject(account, Account.class);
+        var vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
+        vo.add(linkTo(methodOn(AccountController.class).findById(vo.getId())).withSelfRel());
+
+        return vo;
+    }
+
+    public AccountVO updateAccount(AccountVO account) throws Exception {
+        if (account == null) throw new RequiredObjectsIsNullException();
+
+        var entity = ModelMapperAdapter.parseObject(account, Account.class);
+        entity.setName(account.getName());
+        entity.setEmail(account.getEmail());
+        entity.setPassword(account.getPassword());
+
         var vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
         vo.add(linkTo(methodOn(AccountController.class).findById(vo.getId())).withSelfRel());
 

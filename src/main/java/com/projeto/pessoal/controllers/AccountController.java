@@ -27,11 +27,16 @@ public class AccountController {
 
     @GetMapping()
     public ResponseEntity<AccountVO> findAll() throws Exception {
-        return ResponseEntity.ok(accountService.findAll());
+        return ResponseEntity.ok(accountService.findAll().getBody());
     }
 
     @PostMapping(value = "/create")
     public AccountVO create(@RequestBody AccountVO account) throws Exception {
         return accountService.createAccount(account);
+    }
+
+    @PutMapping("/account")
+    public AccountVO update(@RequestBody AccountVO account) throws Exception {
+        return accountService.updateAccount(account);
     }
 }

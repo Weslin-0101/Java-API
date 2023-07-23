@@ -1,6 +1,7 @@
 package com.projeto.pessoal.services;
 
 import com.projeto.pessoal.data.v1.AccountVO;
+import com.projeto.pessoal.exceptions.RequiredObjectsIsNullException;
 import com.projeto.pessoal.mocks.MockAccount;
 import com.projeto.pessoal.model.Account;
 import org.junit.jupiter.api.BeforeEach;
