@@ -7,33 +7,30 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AccountServiceTest {
 
-    private Account AccountMock() {
+    private Account AccountMock(int i) {
         Account account = new Account();
         account.setId((1L));
-        account.setName("weslin");
-        account.setEmail("weslin@gmail.com");
+        account.setName("weslin " + i);
+        account.setEmail("weslin@gmail.com " + i);
         account.setPassword("123456");
 
         return account;
     }
 
     @Test
-    void createAccount() {
-        Account ac = AccountMock();
+    void findById() throws Exception {
+        Account ac = AccountMock(0);
 
-        Account createdAccount = new AccountService().createAccount(ac);
+        Long id = new AccountService().findById(ac.getId()).getId();
 
-        assertEquals(ac, createdAccount);
-        assertEquals(ac.getEmail(), createdAccount.getEmail());
-        assertEquals(ac.getName(), createdAccount.getName());
-        assertEquals(ac.getPassword(), createdAccount.getPassword());
+        assertEquals(ac.getId(), id);
     }
 
     @Test
-    void findByName() {
-        Account ac = AccountMock();
+    void findByName() throws Exception {
+        Account ac = AccountMock(0);
 
-        String name = new AccountService().findByName(ac.getName());
+        String name = new AccountService().findByName(ac.getName()).getName();
 
         assertEquals(ac.getName(), name);
     }
