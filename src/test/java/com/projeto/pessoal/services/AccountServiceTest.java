@@ -61,4 +61,22 @@ class AccountServiceTest {
         assertEquals("Email Test 1", result.getEmail());
         assertEquals("Password Test 1", result.getPassword());
     }
+
+    @Test
+    void createAccount() throws Exception {
+        AccountVO mockAccount = input.mockVO(1);
+        AccountVO persisted = mockAccount;
+        persisted.setId(1L);
+
+        AccountVO mockAccountVO = input.mockVO(1);
+        mockAccountVO.setId(1L);
+        when(services.createAccount(mockAccount)).thenReturn(persisted);
+
+        var result = services.createAccount(mockAccountVO);
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("Name Test 1", result.getName());
+        assertEquals("Email Test 1", result.getEmail());
+        assertEquals("Password Test 1", result.getPassword());
+    }
 }
