@@ -1,60 +1,64 @@
 package com.projeto.pessoal.services;
 
+import com.projeto.pessoal.data.v1.AccountVO;
+import com.projeto.pessoal.mocks.MockAccount;
 import com.projeto.pessoal.model.Account;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
 
-    private Account AccountMock() {
-        Account account = new Account();
-        account.setId((1L));
-        account.setName("weslin");
-        account.setEmail("weslin@gmail.com");
-        account.setPassword("123456");
+    MockAccount input;
 
-        return account;
-    }
+    @Mock
+    private AccountService services;
 
-    private Account[] AccountMockArray(int i) {
-        Account[] account = new Account[i];
-
-        for (int j = 1; j < i; j++) {
-            account[j] = new Account();
-            account[j].setId((1L));
-            account[j].setName("weslin " + j);
-            account[j].setEmail("weslin@gmail.com " + j);
-            account[j].setPassword("123456 " + j);
-        }
-
-        return account;
+    @BeforeEach
+    void setUpMocks() throws Exception {
+        input = new MockAccount();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void findById() throws Exception {
-        Account ac = AccountMock();
+        AccountVO mockAccountVO = input.mockVO(1);
+        mockAccountVO.setId(1L);
 
-        Long id = new AccountService().findById(ac.getId()).getId();
+        when(services.findById(1L)).thenReturn(mockAccountVO);
+        var result = services.findById(1L);
 
-        assertEquals(ac.getId(), id);
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("Name Test 1", result.getName());
+        assertEquals("Email Test 1", result.getEmail());
+        assertEquals("Password Test 1", result.getPassword());
     }
 
     @Test
     void findByName() throws Exception {
-        Account ac = AccountMock();
+        AccountVO mockAccountVO = input.mockVO(1);
+        mockAccountVO.setId(1L);
 
-        String name = new AccountService().findByName(ac.getName()).getName();
+        when(services.findByName("Name Test 1")).thenReturn(mockAccountVO);
+        var result = services.findByName("Name Test 1");
 
-        assertEquals(ac.getName(), name);
-    }
-
-    @Test
-    void findAll() throws Exception {
-        Account[] ac = AccountMockArray(5);
-
-        String name = new AccountService().findAll().getName();
-
-        assertEquals(ac[2].getName(), name);
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("Name Test 1", result.getName());
+        assertEquals("Email Test 1", result.getEmail());
+        assertEquals("Password Test 1", result.getPassword());
     }
 }

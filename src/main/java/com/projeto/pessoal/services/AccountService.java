@@ -17,7 +17,7 @@ public class AccountService {
     @Autowired
     AccountMapper mapper;
 
-    private Account AccountMock() {
+    public Account AccountMock() {
 
         Account account = new Account();
         account.setId((1L));
@@ -28,7 +28,7 @@ public class AccountService {
         return account;
     }
 
-    private Account[] AccountMockArray(int i) {
+    public Account[] AccountMockArray(int i) {
         Account[] account = new Account[i];
 
         for (int j = 1; j < i; j++) {
