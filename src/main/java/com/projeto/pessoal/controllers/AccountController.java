@@ -24,4 +24,9 @@ public class AccountController {
     ) throws Exception {
         return ResponseEntity.ok(accountService.findByName(name));
     }
+
+    @GetMapping()
+    public ResponseEntity<AccountVO> findAll() throws Exception {
+        return ResponseEntity.ok(accountService.findAll());
+    }
 }

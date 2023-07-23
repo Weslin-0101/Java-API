@@ -7,7 +7,6 @@ import com.projeto.pessoal.mapper.custom.AccountMapper;
 import com.projeto.pessoal.model.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -15,24 +14,36 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class AccountService {
 
-    private static final AtomicLong counter = new AtomicLong();
-
     @Autowired
     AccountMapper mapper;
 
-    private Account AccountMock(int i) {
+    private Account AccountMock() {
 
         Account account = new Account();
-        account.setId((counter.incrementAndGet()));
-        account.setName("weslin " + i);
-        account.setEmail("weslin@gmail.com " + i);
-        account.setPassword("123456 " + i);
+        account.setId((1L));
+        account.setName("weslin");
+        account.setEmail("weslin@gmail.com");
+        account.setPassword("123456");
+
+        return account;
+    }
+
+    private Account[] AccountMockArray(int i) {
+        Account[] account = new Account[i];
+
+        for (int j = 1; j < i; j++) {
+            account[j] = new Account();
+            account[j].setId((1L));
+            account[j].setName("weslin " + j);
+            account[j].setEmail("weslin@gmail.com " + j);
+            account[j].setPassword("123456 " + j);
+        }
 
         return account;
     }
 
     public AccountVO findById(Long id) throws Exception {
-        var entity = AccountMock(0);
+        var entity = AccountMock();
 
         AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
         vo.add(linkTo(methodOn(AccountController.class).findById(id)).withSelfRel());
@@ -41,10 +52,19 @@ public class AccountService {
     }
 
     public AccountVO findByName(String name) throws Exception {
-        var entity = AccountMock(0);
+        var entity = AccountMock();
 
         AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
         vo.add(linkTo(methodOn(AccountController.class).findByName(name)).withSelfRel());
+
+        return vo;
+    }
+
+    public AccountVO findAll() throws Exception {
+        var entity = AccountMockArray(5)[2];
+
+        AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
+        vo.add(linkTo(methodOn(AccountController.class).findAll()).withSelfRel());
 
         return vo;
     }
