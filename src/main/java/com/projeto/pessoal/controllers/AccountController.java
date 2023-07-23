@@ -3,6 +3,7 @@ package com.projeto.pessoal.controllers;
 import com.projeto.pessoal.data.v1.AccountVO;
 import com.projeto.pessoal.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,5 +16,12 @@ public class AccountController {
     @GetMapping("/{id}")
     public AccountVO findById(@PathVariable(value = "id") Long id) throws Exception {
         return accountService.findById(id);
+    }
+
+    @GetMapping("/findByName/{name}")
+    public ResponseEntity<AccountVO> findByName (
+            @PathVariable(value = "name") String name
+    ) throws Exception {
+        return ResponseEntity.ok(accountService.findByName(name));
     }
 }

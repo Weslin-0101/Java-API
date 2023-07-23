@@ -20,7 +20,7 @@ public class AccountService {
     @Autowired
     AccountMapper mapper;
 
-    private Account AccountMock(int i ) {
+    private Account AccountMock(int i) {
 
         Account account = new Account();
         account.setId((counter.incrementAndGet()));
@@ -36,6 +36,15 @@ public class AccountService {
 
         AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
         vo.add(linkTo(methodOn(AccountController.class).findById(id)).withSelfRel());
+
+        return vo;
+    }
+
+    public AccountVO findByName(String name) throws Exception {
+        var entity = AccountMock(0);
+
+        AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
+        vo.add(linkTo(methodOn(AccountController.class).findByName(name)).withSelfRel());
 
         return vo;
     }
