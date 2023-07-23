@@ -29,4 +29,9 @@ public class AccountController {
     public ResponseEntity<AccountVO> findAll() throws Exception {
         return ResponseEntity.ok(accountService.findAll());
     }
+
+    @PostMapping(value = "/create")
+    public AccountVO create(@RequestBody AccountVO account) throws Exception {
+        return accountService.createAccount(account);
+    }
 }

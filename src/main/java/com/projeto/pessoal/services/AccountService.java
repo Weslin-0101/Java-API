@@ -68,4 +68,14 @@ public class AccountService {
 
         return vo;
     }
+
+    public AccountVO createAccount(AccountVO account) throws Exception {
+        if (account == null) throw new Exception("Account is null");
+
+        var entity = ModelMapperAdapter.parseObject(account, Account.class);
+        var vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
+        vo.add(linkTo(methodOn(AccountController.class).findById(vo.getId())).withSelfRel());
+
+        return vo;
+    }
 }
