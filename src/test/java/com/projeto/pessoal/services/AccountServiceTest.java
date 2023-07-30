@@ -113,4 +113,14 @@ class AccountServiceTest {
 
         assertTrue(actualMessage.contains(expectedMessage));
     }
+
+    @Test
+    void deleteAccount() throws Exception {
+        Account mockAccount = input.mockEntity();
+        mockAccount.setId(1L);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(mockAccount));
+
+        services.deleteAccount(1L);
+    }
 }
