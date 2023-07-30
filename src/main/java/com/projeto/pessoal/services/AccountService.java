@@ -7,13 +7,13 @@ import com.projeto.pessoal.mapper.ModelMapperAdapter;
 import com.projeto.pessoal.mapper.custom.AccountMapper;
 import com.projeto.pessoal.model.Account;
 import com.projeto.pessoal.repositories.AccountRepository;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.logging.Logger;
@@ -30,31 +30,27 @@ public class AccountService {
     AccountRepository accountRepository;
 
     @Autowired
+    PagedResourcesAssembler<AccountVO> assembler;
+
+    @Autowired
     AccountMapper mapper;
 
-    public Account AccountMock() {
+    private PagedModel<EntityModel<AccountVO>>getEntityModels(Pageable pageable, Page<Account> accountPage) throws Exception {
+        var accountVOPage = accountPage.map(p -> ModelMapperAdapter.parseObject(p, AccountVO.class));
+        accountVOPage.map(p -> {
+            try {
+                return p.add(linkTo(methodOn(AccountController.class).findById(p.getId())).withSelfRel());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-        Account account = new Account();
-        account.setId((1L));
-        account.setName("weslin");
-        account.setEmail("weslin@gmail.com");
-        account.setPassword("123456");
+        Link link = linkTo(methodOn(AccountController.class)
+                .findAll(pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        "asc")).withSelfRel();
 
-        return account;
-    }
-
-    public Account[] AccountMockArray(int i) {
-        Account[] account = new Account[i];
-
-        for (int j = 1; j < i; j++) {
-            account[j] = new Account();
-            account[j].setId((1L));
-            account[j].setName("weslin " + j);
-            account[j].setEmail("weslin@gmail.com " + j);
-            account[j].setPassword("123456 " + j);
-        }
-
-        return account;
+        return assembler.toModel(accountVOPage, link);
     }
 
     public AccountVO findById(Long id) throws Exception {
@@ -68,22 +64,20 @@ public class AccountService {
         return vo;
     }
 
-    public AccountVO findByName(String name) throws Exception {
-        var entity = AccountMock();
+    public PagedModel<EntityModel<AccountVO>> findByName(String name, Pageable pageable) throws Exception {
+        logger.info("Find Account by name");
 
-        AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
-        vo.add(linkTo(methodOn(AccountController.class).findByName(name)).withSelfRel());
+        var accountPage = accountRepository.findByName(name, pageable);
 
-        return vo;
+        return getEntityModels(pageable, accountPage);
     }
 
-    public ResponseEntity<AccountVO> findAll() throws Exception {
-        var entity = AccountMockArray(5)[2];;
+    public PagedModel<EntityModel<AccountVO>> findAll(Pageable pageable) throws Exception {
+        logger.info("Returning all Accounts");
 
-        AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
-        vo.add(linkTo(methodOn(AccountController.class).findAll()).withSelfRel());
+        var accountPage = accountRepository.findAll(pageable);
 
-        return ResponseEntity.ok(vo);
+        return getEntityModels(pageable, accountPage);
     }
 
     public AccountVO createAccount(AccountVO account) throws Exception {

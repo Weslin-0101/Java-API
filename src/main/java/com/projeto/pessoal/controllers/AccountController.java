@@ -3,6 +3,11 @@ package com.projeto.pessoal.controllers;
 import com.projeto.pessoal.data.v1.AccountVO;
 import com.projeto.pessoal.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,15 +24,29 @@ public class AccountController {
     }
 
     @GetMapping("/findByName/{name}")
-    public ResponseEntity<AccountVO> findByName (
-            @PathVariable(value = "name") String name
+    public ResponseEntity<PagedModel<EntityModel<AccountVO>>> findByName (
+            @PathVariable(value = "name") String name,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "12") Integer size,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction
     ) throws Exception {
-        return ResponseEntity.ok(accountService.findByName(name));
+
+        var sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "name"));
+
+        return ResponseEntity.ok(accountService.findByName(name, pageable));
     }
 
     @GetMapping()
-    public ResponseEntity<AccountVO> findAll() throws Exception {
-        return ResponseEntity.ok(accountService.findAll().getBody());
+    public ResponseEntity<PagedModel<EntityModel<AccountVO>>> findAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "12") Integer size,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction
+    ) throws Exception {
+        var sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        var pageable = PageRequest.of(page, size, Sort.by(sortDirection, "name"));
+
+        return ResponseEntity.ok(accountService.findAll(pageable));
     }
 
     @PostMapping(value = "/create")
