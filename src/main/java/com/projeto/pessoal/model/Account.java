@@ -2,18 +2,28 @@ package com.projeto.pessoal.model;
 
 import jakarta.persistence.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Account {
+@Entity
+@Table(name = "account")
+public class Account implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(nullable = false, length = 150, unique = true)
     private String email;
 
+    @Column(nullable = false, length = 150)
     private String password;
 
     public Account() {}

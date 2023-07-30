@@ -1,14 +1,18 @@
 package com.projeto.pessoal.data.v1;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@JsonPropertyOrder({"id", "name", "email", "password"})
 public class AccountVO extends RepresentationModel<AccountVO> implements Serializable {
 
     private static final Long serialVersionUID = 1L;
 
+    @JsonProperty("id")
     private Long id;
     private String name;
     private String email;
