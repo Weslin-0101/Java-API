@@ -2,6 +2,7 @@ package com.projeto.pessoal.controllers;
 
 import com.projeto.pessoal.data.v1.AccountVO;
 import com.projeto.pessoal.services.AccountService;
+import com.projeto.pessoal.util.MediaTypeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +19,18 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @GetMapping("/{id}")
+    @GetMapping(
+            value = "/{id}",
+            produces = { MediaTypeUtil.APPLICATION_JSON }
+    )
     public AccountVO findById(@PathVariable(value = "id") Long id) throws Exception {
         return accountService.findById(id);
     }
 
-    @GetMapping("/findByName/{name}")
+    @GetMapping(
+            value = "/findByName/{name}",
+            produces = { MediaTypeUtil.APPLICATION_JSON }
+    )
     public ResponseEntity<PagedModel<EntityModel<AccountVO>>> findByName (
             @PathVariable(value = "name") String name,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -37,7 +44,9 @@ public class AccountController {
         return ResponseEntity.ok(accountService.findByName(name, pageable));
     }
 
-    @GetMapping()
+    @GetMapping(
+            produces = { MediaTypeUtil.APPLICATION_JSON }
+    )
     public ResponseEntity<PagedModel<EntityModel<AccountVO>>> findAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "12") Integer size,
@@ -49,17 +58,25 @@ public class AccountController {
         return ResponseEntity.ok(accountService.findAll(pageable));
     }
 
-    @PostMapping(value = "/create")
+    @PostMapping(
+            value = "/create",
+            produces = { MediaTypeUtil.APPLICATION_JSON }
+    )
     public AccountVO create(@RequestBody AccountVO account) throws Exception {
         return accountService.createAccount(account);
     }
 
-    @PutMapping()
+    @PutMapping(
+            produces = { MediaTypeUtil.APPLICATION_JSON }
+    )
     public AccountVO update(@RequestBody AccountVO account) throws Exception {
         return accountService.updateAccount(account);
     }
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(
+            value = "/{id}",
+            produces = { MediaTypeUtil.APPLICATION_JSON }
+    )
     public ResponseEntity<?> delete (@PathVariable (value = "id") Long id) throws Exception {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
