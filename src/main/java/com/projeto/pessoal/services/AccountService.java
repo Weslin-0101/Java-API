@@ -3,6 +3,7 @@ package com.projeto.pessoal.services;
 import com.projeto.pessoal.controllers.AccountController;
 import com.projeto.pessoal.data.v1.AccountVO;
 import com.projeto.pessoal.exceptions.RequiredObjectsIsNullException;
+import com.projeto.pessoal.exceptions.ResourceNotFoundException;
 import com.projeto.pessoal.mapper.ModelMapperAdapter;
 import com.projeto.pessoal.mapper.custom.AccountMapper;
 import com.projeto.pessoal.model.Account;
@@ -15,6 +16,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.logging.Logger;
 
@@ -56,7 +58,7 @@ public class AccountService {
     public AccountVO findById(Long id) throws Exception {
         logger.info("Find Account by id");
         var entity = accountRepository.findById(id)
-                .orElseThrow(() -> new Exception("No record found for this ID"));
+                .orElseThrow(() -> new ResourceAccessException("No record found for this ID"));
 
         AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
         vo.add(linkTo(methodOn(AccountController.class).findById(id)).withSelfRel());
@@ -96,7 +98,7 @@ public class AccountService {
 
         logger.info("Updating Account");
         var entity = accountRepository.findById(account.getId())
-                        .orElseThrow(() -> new Exception("No records found for this ID"));
+                        .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
         entity.setName(account.getName());
         entity.setEmail(account.getEmail());
         entity.setPassword(account.getPassword());
@@ -107,11 +109,11 @@ public class AccountService {
         return vo;
     }
 
-    public void deleteAccount(Long id) throws Exception {
+    public void deleteAccount(Long id) {
         logger.info("Deleting Account");
 
         var entity = accountRepository.findById(id)
-                .orElseThrow(() -> new Exception("No records found for this ID"));
+                .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
         accountRepository.delete(entity);
     }
 }
