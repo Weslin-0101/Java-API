@@ -101,4 +101,16 @@ class AccountServiceTest {
         assertEquals("Email Test 1", result.getEmail());
         assertEquals("Password Test 1", result.getPassword());
     }
+
+    @Test
+    void updateWithNullAccount() throws Exception {
+        Exception exception = assertThrows(RequiredObjectsIsNullException.class, () -> {
+            services.updateAccount(null);
+        });
+
+        String expectedMessage = "It is not allowed to persist a null object";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
 }
