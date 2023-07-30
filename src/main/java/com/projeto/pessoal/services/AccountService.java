@@ -112,4 +112,12 @@ public class AccountService {
 
         return vo;
     }
+
+    public void deleteAccount(Long id) throws Exception {
+        logger.info("Deleting Account");
+
+        var entity = accountRepository.findById(id)
+                .orElseThrow(() -> new Exception("No records found for this ID"));
+        accountRepository.delete(entity);
+    }
 }

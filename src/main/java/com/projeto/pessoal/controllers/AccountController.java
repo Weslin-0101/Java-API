@@ -35,8 +35,14 @@ public class AccountController {
         return accountService.createAccount(account);
     }
 
-    @PutMapping("/account")
+    @PutMapping()
     public AccountVO update(@RequestBody AccountVO account) throws Exception {
         return accountService.updateAccount(account);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> delete (@PathVariable (value = "id") Long id) throws Exception {
+        accountService.deleteAccount(id);
+        return ResponseEntity.noContent().build();
     }
 }
