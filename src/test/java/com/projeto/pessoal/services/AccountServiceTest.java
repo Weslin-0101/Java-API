@@ -4,6 +4,7 @@ import com.projeto.pessoal.data.v1.AccountVO;
 import com.projeto.pessoal.exceptions.RequiredObjectsIsNullException;
 import com.projeto.pessoal.mocks.MockAccount;
 import com.projeto.pessoal.model.Account;
+import com.projeto.pessoal.repositories.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -24,8 +25,11 @@ class AccountServiceTest {
 
     MockAccount input;
 
-    @Mock
+    @InjectMocks
     private AccountService services;
+
+    @Mock
+    AccountRepository repository;
 
     @BeforeEach
     void setUpMocks() throws Exception {
@@ -35,10 +39,10 @@ class AccountServiceTest {
 
     @Test
     void findById() throws Exception {
-        AccountVO mockAccountVO = input.mockVO(1);
-        mockAccountVO.setId(1L);
+        Account mockAccount = input.mockEntity(1);
+        mockAccount.setId(1L);
 
-        when(services.findById(1L)).thenReturn(mockAccountVO);
+        when(repository.findById(1L)).thenReturn(Optional.of(mockAccount));
         var result = services.findById(1L);
 
         assertNotNull(result);
@@ -49,33 +53,50 @@ class AccountServiceTest {
     }
 
     @Test
-    void findByName() throws Exception {
+    void createAccount() throws Exception {
+        Account mockAccount = input.mockEntity(1);
+        mockAccount.setId(1L);
+
         AccountVO mockAccountVO = input.mockVO(1);
         mockAccountVO.setId(1L);
+        when(repository.save(mockAccount)).thenReturn(mockAccount);
 
-        when(services.findByName("Name Test 1")).thenReturn(mockAccountVO);
-        var result = services.findByName("Name Test 1");
-
+        var result = services.createAccount(mockAccountVO);
         assertNotNull(result);
         assertNotNull(result.getId());
+        assertNotNull(result.getLinks());
         assertEquals("Name Test 1", result.getName());
         assertEquals("Email Test 1", result.getEmail());
         assertEquals("Password Test 1", result.getPassword());
     }
 
     @Test
-    void createAccount() throws Exception {
-        AccountVO mockAccount = input.mockVO(1);
-        AccountVO persisted = mockAccount;
-        persisted.setId(1L);
+    void createWithNullAccount() throws Exception {
+        Exception exception = assertThrows(RequiredObjectsIsNullException.class, () -> {
+            services.createAccount(null);
+        });
+
+        String expectedMessage = "It is not allowed to persist a null object";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void updateAccount() throws Exception {
+        Account mockAccount = input.mockEntity(1);
+        mockAccount.setId(1L);
 
         AccountVO mockAccountVO = input.mockVO(1);
         mockAccountVO.setId(1L);
-        when(services.createAccount(mockAccount)).thenReturn(persisted);
 
-        var result = services.createAccount(mockAccountVO);
+        when(repository.findById(1L)).thenReturn(Optional.of(mockAccount));
+        when(repository.save(mockAccount)).thenReturn(mockAccount);
+
+        var result = services.updateAccount(mockAccountVO);
         assertNotNull(result);
         assertNotNull(result.getId());
+        assertNotNull(result.getLinks());
         assertEquals("Name Test 1", result.getName());
         assertEquals("Email Test 1", result.getEmail());
         assertEquals("Password Test 1", result.getPassword());
