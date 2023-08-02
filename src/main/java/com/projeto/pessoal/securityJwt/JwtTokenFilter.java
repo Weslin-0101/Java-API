@@ -13,7 +13,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import java.io.IOException;
 
 public class JwtTokenFilter extends GenericFilterBean {
-
+    @Autowired
     private final JwtTokenProvider jwtTokenProvider;
 
     public JwtTokenFilter(JwtTokenProvider jwtTokenProvider) {
