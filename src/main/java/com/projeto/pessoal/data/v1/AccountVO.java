@@ -16,7 +16,12 @@ public class AccountVO extends RepresentationModel<AccountVO> implements Seriali
     private Long id;
     private String name;
     private String email;
+    private String userName;
     private String password;
+    private Boolean accountNonExpired;
+    private Boolean accountNonLocked;
+    private Boolean credentialsNonExpired;
+    private Boolean enabled;
 
     public AccountVO() {}
 
@@ -44,6 +49,14 @@ public class AccountVO extends RepresentationModel<AccountVO> implements Seriali
         this.email = email;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -52,17 +65,49 @@ public class AccountVO extends RepresentationModel<AccountVO> implements Seriali
         this.password = password;
     }
 
+    public Boolean getAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    public void setAccountNonExpired(Boolean accountNonExpired) {
+        this.accountNonExpired = accountNonExpired;
+    }
+
+    public Boolean getAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    public void setAccountNonLocked(Boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
+    public Boolean getCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    public void setCredentialsNonExpired(Boolean credentialsNonExpired) {
+        this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        AccountVO personVO = (AccountVO) o;
-        return Objects.equals(id, personVO.id) && Objects.equals(name, personVO.name) && Objects.equals(email, personVO.email) && Objects.equals(password, personVO.password);
+        AccountVO accountVO = (AccountVO) o;
+        return Objects.equals(id, accountVO.id) && Objects.equals(name, accountVO.name) && Objects.equals(email, accountVO.email) && Objects.equals(userName, accountVO.userName) && Objects.equals(password, accountVO.password) && Objects.equals(accountNonExpired, accountVO.accountNonExpired) && Objects.equals(accountNonLocked, accountVO.accountNonLocked) && Objects.equals(credentialsNonExpired, accountVO.credentialsNonExpired) && Objects.equals(enabled, accountVO.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, name, email, password);
+        return Objects.hash(super.hashCode(), id, name, email, userName, password, accountNonExpired, accountNonLocked, credentialsNonExpired, enabled);
     }
 }
