@@ -47,8 +47,7 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/auth/signing"
                                 ).permitAll()
-                                .requestMatchers("/api/**").authenticated()
-                                .requestMatchers("/users").denyAll()
+                                .requestMatchers("api/**").permitAll()
                 )
                 .apply(new JwtConfigurer(jwtTokenProvider));
 
