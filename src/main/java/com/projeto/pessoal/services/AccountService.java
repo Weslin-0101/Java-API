@@ -1,134 +1,99 @@
 package com.projeto.pessoal.services;
 
-import com.projeto.pessoal.controllers.AccountController;
-import com.projeto.pessoal.data.v1.AccountVO;
+import com.projeto.pessoal.data.v1.AccountDTO.AccountRequestDTO;
+import com.projeto.pessoal.data.v1.AccountDTO.AccountResponseDTO;
 import com.projeto.pessoal.exceptions.RequiredObjectsIsNullException;
 import com.projeto.pessoal.exceptions.ResourceNotFoundException;
-import com.projeto.pessoal.mapper.ModelMapperAdapter;
-import com.projeto.pessoal.mapper.custom.AccountMapper;
 import com.projeto.pessoal.model.Account;
 import com.projeto.pessoal.repositories.AccountRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @Service
-public class AccountService implements UserDetailsService {
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+public class AccountService {
 
     private final Logger logger = Logger.getLogger(AccountService.class.getName());
 
     @Autowired
-    AccountRepository accountRepository;
-
+    private AccountRepository accountRepository;
     @Autowired
-    PagedResourcesAssembler<AccountVO> assembler;
+    private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    AccountMapper mapper;
-
-    private PagedModel<EntityModel<AccountVO>>getEntityModels(Pageable pageable, Page<Account> accountPage) throws Exception {
-        var accountVOPage = accountPage.map(p -> ModelMapperAdapter.parseObject(p, AccountVO.class));
-        accountVOPage.map(p -> {
-            try {
-                return p.add(linkTo(methodOn(AccountController.class).findById(p.getId())).withSelfRel());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        Link link = linkTo(methodOn(AccountController.class)
-                .findAll(pageable.getPageNumber(),
-                        pageable.getPageSize(),
-                        "asc")).withSelfRel();
-
-        return assembler.toModel(accountVOPage, link);
-    }
-
-    public AccountVO findById(Long id) throws Exception {
+    public Account findById(UUID id) throws Exception {
         logger.info("Find Account by id");
-        var entity = accountRepository.findById(id)
-                .orElseThrow(() -> new ResourceAccessException("No record found for this ID"));
 
-        AccountVO vo = ModelMapperAdapter.parseObject(entity, AccountVO.class);
-        vo.add(linkTo(methodOn(AccountController.class).findById(id)).withSelfRel());
-
-        return vo;
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No record found for this ID"));
     }
 
-    public PagedModel<EntityModel<AccountVO>> findByName(String name, Pageable pageable) throws Exception {
-        logger.info("Find Account by name");
+    public Account findByEmail(String email) {
+        logger.info("Find Account by email");
 
-        var accountPage = accountRepository.findByName(name, pageable);
-
-        return getEntityModels(pageable, accountPage);
+        return accountRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("No record found for this email"));
     }
 
-    public PagedModel<EntityModel<AccountVO>> findAll(Pageable pageable) throws Exception {
-        logger.info("Returning all Accounts");
+    public Account findByUsername(String username) {
+        logger.info("Find Account by username");
 
-        var accountPage = accountRepository.findAll(pageable);
-
-        return getEntityModels(pageable, accountPage);
+        return accountRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("No record found for this username: " + username));
     }
 
-    public AccountVO createAccount(AccountVO account) throws Exception {
-        if (account == null) throw new RequiredObjectsIsNullException();
+    public List<Account> findAll() {
+        logger.info("Find all Accounts");
+
+        return accountRepository.findAll();
+    }
+
+    public AccountResponseDTO createAccount(AccountRequestDTO request) throws Exception {
+        if (request == null) throw new RequiredObjectsIsNullException();
 
         logger.info("Creating Account");
-        var entity = ModelMapperAdapter.parseObject(account, Account.class);
-        var vo = ModelMapperAdapter.parseObject(accountRepository.save(entity), AccountVO.class);
-        vo.add(linkTo(methodOn(AccountController.class).findById(vo.getId())).withSelfRel());
+        var account = Account.builder()
+                .name(request.getName())
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
 
-        return vo;
+        accountRepository.save(account);
+        return AccountResponseDTO.builder()
+                .id(account.getId())
+                .name(account.getName())
+                .username(account.getUsername())
+                .email(account.getEmail())
+                .password(account.getPassword())
+                .build();
     }
 
-    public AccountVO updateAccount(AccountVO account) throws Exception {
-        if (account == null) throw new RequiredObjectsIsNullException();
+    public Account updateAccount(String email, AccountRequestDTO request) throws Exception {
+        if (request == null) throw new RequiredObjectsIsNullException();
 
         logger.info("Updating Account");
-        var entity = accountRepository.findById(account.getId())
-                        .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
-        entity.setName(account.getName());
-        entity.setEmail(account.getEmail());
-        entity.setPassword(account.getPassword());
+        var entity = accountRepository.findByEmail(email)
+                        .orElseThrow(() -> new ResourceNotFoundException("No records found for this Email: " + email));
+        entity.setName(request.getName());
+        entity.setUsername(request.getUsername());
+        entity.setEmail(request.getEmail());
+        entity.setPassword(request.getPassword());
 
-        var vo = ModelMapperAdapter.parseObject(accountRepository.save(entity), AccountVO.class);
-        vo.add(linkTo(methodOn(AccountController.class).findById(vo.getId())).withSelfRel());
-
-        return vo;
+        return entity;
     }
 
-    public void deleteAccount(Long id) {
+    public void deleteAccount(String email) {
         logger.info("Deleting Account");
 
-        var entity = accountRepository.findById(id)
+        var entity = accountRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
         accountRepository.delete(entity);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.info("Finding user by username: " + username);
-
-        var user = accountRepository.findByUsername(username);
-        if (user != null) {
-            return user;
-        } else {
-            throw new UsernameNotFoundException("User " + username + " not found!");
-        }
     }
 }

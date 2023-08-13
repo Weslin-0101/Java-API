@@ -1,55 +1,28 @@
 package com.projeto.pessoal.mocks;
 
-import com.projeto.pessoal.data.v1.AccountVO;
+import com.projeto.pessoal.data.v1.AccountDTO.AccountRequestDTO;
 import com.projeto.pessoal.model.Account;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MockAccount {
-
-    public Account mockEntity() {
-        return mockEntity(0);
-    }
-
-    public AccountVO mockVO() {
-        return mockVO(0);
-    }
-
     public List<Account> mockEntityList() {
         List<Account> accounts = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            accounts.add(mockEntity(i));
-        }
+        accounts.add(new Account(UUID.randomUUID(), "test_name_1", "test_email_1", "test_password_1"));
+        accounts.add(new Account(UUID.randomUUID(), "test_name_2", "test_email_2", "test_password_2"));
 
         return accounts;
     }
 
-    public List<AccountVO> mockVOList() {
-        List<AccountVO> accounts = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            accounts.add(mockVO(i));
-        }
-
-        return accounts;
-    }
-
-    public Account mockEntity(Integer number) {
+    public Account mockEntity() {
         Account account = new Account();
-        account.setId((long) number);
-        account.setName("Name Test " + number);
-        account.setEmail("Email Test " + number);
-        account.setPassword("Password Test " + number);
-
-        return account;
-    }
-
-    public AccountVO mockVO(Integer number) {
-        AccountVO account = new AccountVO();
-        account.setId((long) number);
-        account.setName("Name Test " + number);
-        account.setEmail("Email Test " + number);
-        account.setPassword("Password Test " + number);
+        account.setId(UUID.randomUUID());
+        account.setName("test_name");
+        account.setUsername("test_username");
+        account.setEmail("test_email@gmail.com");
+        account.setPassword("test_password");
 
         return account;
     }

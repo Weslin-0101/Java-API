@@ -1,29 +1,29 @@
 package com.projeto.pessoal.controllers;
 
-import com.projeto.pessoal.data.v1.AccountVO;
+import com.projeto.pessoal.data.v1.AccountDTO.AccountRequestDTO;
+import com.projeto.pessoal.data.v1.AccountDTO.AccountResponseDTO;
+import com.projeto.pessoal.model.Account;
 import com.projeto.pessoal.services.AccountService;
 import com.projeto.pessoal.util.MediaTypeUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.PagedModel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/account/v1")
+@RequiredArgsConstructor
 public class AccountController {
 
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
 
     @GetMapping(
             value = "/{id}",
             produces = { MediaTypeUtil.APPLICATION_JSON }
     )
-    public AccountVO findById(@PathVariable(value = "id") Long id) throws Exception {
+    public Account findById(@PathVariable(value = "id") UUID id) throws Exception {
         return accountService.findById(id);
     }
 
@@ -31,54 +31,44 @@ public class AccountController {
             value = "/findByName/{name}",
             produces = { MediaTypeUtil.APPLICATION_JSON }
     )
-    public ResponseEntity<PagedModel<EntityModel<AccountVO>>> findByName (
-            @PathVariable(value = "name") String name,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "12") Integer size,
-            @RequestParam(value = "direction", defaultValue = "asc") String direction
-    ) throws Exception {
-
-        var sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "name"));
-
-        return ResponseEntity.ok(accountService.findByName(name, pageable));
+    public ResponseEntity<Account> findByName (
+            @PathVariable(value = "name") String name
+    ) {
+        return ResponseEntity.ok(accountService.findByUsername(name));
     }
 
     @GetMapping(
             produces = { MediaTypeUtil.APPLICATION_JSON }
     )
-    public ResponseEntity<PagedModel<EntityModel<AccountVO>>> findAll(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "12") Integer size,
-            @RequestParam(value = "direction", defaultValue = "asc") String direction
-    ) throws Exception {
-        var sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        var pageable = PageRequest.of(page, size, Sort.by(sortDirection, "name"));
-
-        return ResponseEntity.ok(accountService.findAll(pageable));
+    public ResponseEntity<List<Account>> findAll() {
+        return ResponseEntity.ok(accountService.findAll());
     }
 
     @PostMapping(
             value = "/create",
             produces = { MediaTypeUtil.APPLICATION_JSON }
     )
-    public AccountVO create(@RequestBody AccountVO account) throws Exception {
-        return accountService.createAccount(account);
+    public ResponseEntity<AccountResponseDTO> create(@RequestBody AccountRequestDTO request) throws Exception {
+        return ResponseEntity.ok(accountService.createAccount(request));
     }
 
     @PutMapping(
+            value = "/{email}",
             produces = { MediaTypeUtil.APPLICATION_JSON }
     )
-    public AccountVO update(@RequestBody AccountVO account) throws Exception {
-        return accountService.updateAccount(account);
+    public ResponseEntity<Account> update(
+            @PathVariable(value = "email") String email,
+            @RequestBody AccountRequestDTO request
+    ) throws Exception {
+        return ResponseEntity.ok(accountService.updateAccount(email, request));
     }
 
     @DeleteMapping(
-            value = "/{id}",
+            value = "/{email}",
             produces = { MediaTypeUtil.APPLICATION_JSON }
     )
-    public ResponseEntity<?> delete (@PathVariable (value = "id") Long id) throws Exception {
-        accountService.deleteAccount(id);
+    public ResponseEntity<?> delete (@PathVariable (value = "email") String email) {
+        accountService.deleteAccount(email);
         return ResponseEntity.noContent().build();
     }
 }

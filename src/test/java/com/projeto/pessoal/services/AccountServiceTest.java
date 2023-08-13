@@ -1,6 +1,6 @@
 package com.projeto.pessoal.services;
 
-import com.projeto.pessoal.data.v1.AccountVO;
+import com.projeto.pessoal.data.v1.AccountDTO.AccountRequestDTO;
 import com.projeto.pessoal.exceptions.RequiredObjectsIsNullException;
 import com.projeto.pessoal.mocks.MockAccount;
 import com.projeto.pessoal.model.Account;
@@ -14,10 +14,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
@@ -39,36 +41,77 @@ class AccountServiceTest {
 
     @Test
     void findById() throws Exception {
-        Account mockAccount = input.mockEntity(1);
-        mockAccount.setId(1L);
+        Account mockAccount = input.mockEntity();
+        UUID mockAccountID = UUID.randomUUID();
+        mockAccount.setId(mockAccountID);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(mockAccount));
-        var result = services.findById(1L);
+        when(repository.findById(mockAccountID)).thenReturn(Optional.of(mockAccount));
+        Account result = services.findById(mockAccountID);
 
         assertNotNull(result);
         assertNotNull(result.getId());
-        assertEquals("Name Test 1", result.getName());
-        assertEquals("Email Test 1", result.getEmail());
-        assertEquals("Password Test 1", result.getPassword());
+        assertEquals("test_name", result.getName());
+        assertEquals("test_username", result.getUsername());
+        assertEquals("test_email@gmail.com", result.getEmail());
+        assertEquals("test_password", result.getPassword());
+    }
+
+    @Test
+    void findByEmail() throws Exception {
+        Account mockAccount = input.mockEntity();
+
+        when(repository.findByEmail(mockAccount.getEmail())).thenReturn(Optional.of(mockAccount));
+        Account result = services.findByEmail(mockAccount.getEmail());
+
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("test_name", result.getName());
+        assertEquals("test_username", result.getUsername());
+        assertEquals("test_email@gmail.com", result.getEmail());
+        assertEquals("test_password", result.getPassword());
+    }
+
+    @Test
+    void findByUsername() throws Exception {
+        Account mockAccount = input.mockEntity();
+
+        when(repository.findByUsername(mockAccount.getUsername())).thenReturn(Optional.of(mockAccount));
+        Account result = services.findByUsername(mockAccount.getUsername());
+
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("test_name", result.getName());
+        assertEquals("test_username", result.getUsername());
+        assertEquals("test_email@gmail.com", result.getEmail());
+        assertEquals("test_password", result.getPassword());
+    }
+
+    @Test
+    void findAll() throws Exception {
+        List<Account> mock = input.mockEntityList();
+
+        when(repository.findAll()).thenReturn(mock);
+        List<Account> result = services.findAll();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     void createAccount() throws Exception {
-        Account mockAccount = input.mockEntity(1);
-        mockAccount.setId(1L);
+        AccountRequestDTO request = new AccountRequestDTO();
+        request.setName("test_name");
+        request.setUsername("test_username");
+        request.setEmail("test_email@gmail.com");
+        request.setPassword("test_password");
 
-        AccountVO mockAccountVO = input.mockVO(1);
-        mockAccountVO.setId(1L);
-        when(repository.save(mockAccount)).thenReturn(mockAccount);
-
-        var result = services.createAccount(mockAccountVO);
+        var result = services.createAccount(request);
         assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getLinks());
-        assertEquals("Name Test 1", result.getName());
-        assertEquals("Email Test 1", result.getEmail());
-        assertEquals("Password Test 1", result.getPassword());
-    }
+        assertEquals("test_name", result.getName());
+        assertEquals("test_username", result.getUsername());
+        assertEquals("test_email@gmail.com", result.getEmail());
+        assertEquals("test_password", result.getPassword());
+    };
 
     @Test
     void createWithNullAccount() throws Exception {
@@ -84,28 +127,30 @@ class AccountServiceTest {
 
     @Test
     void updateAccount() throws Exception {
-        Account mockAccount = input.mockEntity(1);
-        mockAccount.setId(1L);
+        Account mockAccount = input.mockEntity();
+        UUID mockAccountID = UUID.randomUUID();
+        mockAccount.setId(mockAccountID);
 
-        AccountVO mockAccountVO = input.mockVO(1);
-        mockAccountVO.setId(1L);
+        AccountRequestDTO request = new AccountRequestDTO();
+        request.setName("test_name");
+        request.setUsername("test_username");
+        request.setEmail("test_email@gmail.com");
+        request.setPassword("test_password");
 
-        when(repository.findById(1L)).thenReturn(Optional.of(mockAccount));
-        when(repository.save(mockAccount)).thenReturn(mockAccount);
+        when(repository.findByEmail(mockAccount.getEmail())).thenReturn(Optional.of(mockAccount));
+        var result = services.updateAccount(request.getEmail(), request);
 
-        var result = services.updateAccount(mockAccountVO);
         assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getLinks());
-        assertEquals("Name Test 1", result.getName());
-        assertEquals("Email Test 1", result.getEmail());
-        assertEquals("Password Test 1", result.getPassword());
+        assertEquals("test_name", result.getName());
+        assertEquals("test_username", result.getUsername());
+        assertEquals("test_email@gmail.com", result.getEmail());
+        assertEquals("test_password", result.getPassword());
     }
 
     @Test
     void updateWithNullAccount() throws Exception {
         Exception exception = assertThrows(RequiredObjectsIsNullException.class, () -> {
-            services.updateAccount(null);
+            services.updateAccount(null, null);
         });
 
         String expectedMessage = "It is not allowed to persist a null object";
@@ -117,10 +162,9 @@ class AccountServiceTest {
     @Test
     void deleteAccount() throws Exception {
         Account mockAccount = input.mockEntity();
-        mockAccount.setId(1L);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(mockAccount));
+        when(repository.findByEmail(mockAccount.getEmail())).thenReturn(Optional.of(mockAccount));
 
-        services.deleteAccount(1L);
+        services.deleteAccount(mockAccount.getEmail());
     }
 }
