@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,8 @@ class AccountServiceTest {
 
     @InjectMocks
     private AccountService services;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     AccountRepository repository;
@@ -105,12 +108,15 @@ class AccountServiceTest {
         request.setEmail("test_email@gmail.com");
         request.setPassword("test_password");
 
+        when(passwordEncoder.encode(anyString())).thenReturn("encoded_password");
+
         var result = services.createAccount(request);
+        System.out.println(result);
         assertNotNull(result);
         assertEquals("test_name", result.getName());
         assertEquals("test_username", result.getUsername());
         assertEquals("test_email@gmail.com", result.getEmail());
-        assertEquals("test_password", result.getPassword());
+        assertEquals("encoded_password", result.getPassword());
     };
 
     @Test
