@@ -5,6 +5,7 @@ import com.projeto.pessoal.data.v1.AccountDTO.AccountResponseDTO;
 import com.projeto.pessoal.exceptions.RequiredObjectsIsNullException;
 import com.projeto.pessoal.exceptions.ResourceNotFoundException;
 import com.projeto.pessoal.model.Account;
+import com.projeto.pessoal.model.Permission;
 import com.projeto.pessoal.repositories.AccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,7 @@ public class AccountService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .permission(Permission.ADMIN)
                 .build();
 
         accountRepository.save(account);
