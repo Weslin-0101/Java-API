@@ -32,7 +32,9 @@ public class SecurityConfig {
                         authorizeRequests -> authorizeRequests
                                 .requestMatchers(
                                         "/api/auth/v1/authenticate",
-                                        "/api/account/v1/create"
+                                        "/api/account/v1/create",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
