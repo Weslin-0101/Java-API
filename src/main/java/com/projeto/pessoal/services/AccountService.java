@@ -39,7 +39,7 @@ public class AccountService {
         logger.info("Find Account by email");
 
         return accountRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("No record found for this email"));
+                .orElseThrow(() -> new EntityNotFoundException("No record found for this email: " + email));
     }
 
     public Account findByUsername(String username) {

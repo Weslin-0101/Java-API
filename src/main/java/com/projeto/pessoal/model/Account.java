@@ -1,29 +1,28 @@
 package com.projeto.pessoal.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "account")
-public class Account implements UserDetails {
+public class Account extends RepresentationModel<Account> implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @Column(nullable = false, length = 100)
     private String name;
-    @Column(length = 100)
+    @Column(nullable = false, length = 100)
     private String username;
     @Column(nullable = false, length = 150, unique = true)
     private String email;
