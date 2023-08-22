@@ -30,3 +30,8 @@ spring:
   graphql:
     cors:
       allowed-origin-patterns: http://localhost:8080
+springdoc:
+  swagger-ui:
+    use-root-path: true
+  paths-to-match:
+    - /api/**/v1/**
