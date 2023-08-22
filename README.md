@@ -17,7 +17,7 @@ RESTful API developed in SpringBoot for my project to put into practice everythi
 - **Update an account**
 - **Delete an account**
 - **Login system generating JWT Token with a duration of 1 hour**
-- **Route access system through JWT Token*8
+- **Route access system through JWT Token**
 
 In total, the project has practical knowledge in areas such as:
 
