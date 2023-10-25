@@ -9,9 +9,14 @@ application:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5440/springbootdb
-    username: postgresql
-    password: desafio
+    url: jdbc:postgresql://localhost:4141/userapidb
+    username: weslin-pessoal
+    password: weslin-pessoal
+
+  rabbitmq:
+    addresses: amqps://murwkxya:NdHi8c6sw-XpYT-L5APgHT3YPi2iUpCB@sparrow.rmq.cloudamqp.com/murwkxya
+    template:
+      default-receive-queue: ms.project
 
   jpa:
     hibernate:

@@ -6,8 +6,10 @@ import com.projeto.pessoal.exceptions.RequiredObjectsIsNullException;
 import com.projeto.pessoal.exceptions.ResourceNotFoundException;
 import com.projeto.pessoal.model.Account;
 import com.projeto.pessoal.model.Permission;
+import com.projeto.pessoal.producers.UserProducer;
 import com.projeto.pessoal.repositories.AccountRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,7 @@ public class AccountService {
     private AccountRepository accountRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    final UserProducer userProducer;
 
     public Account findById(UUID id) throws Exception {
         logger.info("Find Account by id");
@@ -55,6 +58,7 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
+    @Transactional
     public AccountResponseDTO createAccount(AccountRequestDTO request) throws Exception {
         if (request == null) throw new RequiredObjectsIsNullException();
 
@@ -66,8 +70,9 @@ public class AccountService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .permission(Permission.ADMIN)
                 .build();
-
         accountRepository.save(account);
+        userProducer.publishMessageEmail(account);
+
         return AccountResponseDTO.builder()
                 .id(account.getId())
                 .name(account.getName())

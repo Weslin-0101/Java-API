@@ -6,8 +6,8 @@ services:
     image: bitnami/postgresql:latest
     restart: always
     ports:
-      - "5440:5432"
+      - "4141:5432"
     environment:
-      - POSTGRESQL_USERNAME=postgresql
-      - POSTGRESQL_PASSWORD=desafio
-      - POSTGRESQL_DATABASE=springbootdb
+      - POSTGRESQL_USERNAME=weslin-pessoal
+      - POSTGRESQL_PASSWORD=weslin-pessoal
+      - POSTGRESQL_DATABASE=userapidb
